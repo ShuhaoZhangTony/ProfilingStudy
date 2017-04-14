@@ -1,0 +1,37 @@
+Manifest-Version: 1.0
+Class-Path: jetty-6.1.26.jar servlet-api-2.5.jar gt-data-11.1.jar gt-x
+ sd-gml3-11.1.jar commons-jxpath-1.3.jar commons-collections-3.2.1.jar
+  stringtemplate-3.2.jar jt-utils-1.3.1.jar gt-xml-11.1.jar httpcore-4
+ .4.1.jar servlet-api-2.5-20081211.jar gt-graph-11.1.jar storm-kafka-0
+ .9.4.jar jackson-core-2.4.3.jar gson-2.3.1.jar jgridshift-1.0.jar jed
+ is-2.4.2.jar antlr-2.7.7.jar gt-api-11.1.jar antlr-runtime-3.2.jar ja
+ mm-0.2.5.jar curator-framework-2.5.0.jar slf4j-api-1.7.12.jar httpcli
+ ent-4.4.jar libthrift-0.7.0.jar gt-main-11.1.jar gt-metadata-11.1.jar
+  gt-xsd-core-11.1.jar zookeeper-3.4.6.jar netty-3.7.0.Final.jar commo
+ ns-pool2-2.0.jar jsr-275-1.0-beta-2.jar ecore-2.6.1.jar common-2.6.0.
+ jar jsr305-1.3.9.jar jts-1.13.jar commons-logging-1.1.3.jar jdom-1.1.
+ 3.jar maxmind-db-1.0.0.jar commons-codec-1.6.jar log4j-1.2.17.jar com
+ mons-lang3-3.3.2.jar net.opengis.fes-11.1.jar geoip2-2.1.0.jar cassan
+ dra-thrift-1.1.1.jar cassandra-all-1.1.1.jar postgis-jdbc-1.3.3.jar g
+ oogle-http-client-1.19.0.jar guava-18.0.jar gt-coverage-11.1.jar gt-x
+ sd-fes-11.1.jar astyanax-1.56.24.jar xml-apis-1.0.b2.jar jackson-core
+ -asl-1.9.13.jar jettison-1.2.jar joda-time-2.7.jar json-simple-1.1.ja
+ r commons-pool-1.5.4.jar picocontainer-1.2.jar snappy-java-1.0.4.1.ja
+ r avro-1.4.0-cassandra-1.jar snaptree-0.1.jar gt-xsd-gml2-11.1.jar pe
+ rsistence-api-1.0.jar lingpipe-4.0.1.jar gt-opengis-11.1.jar postgres
+ ql-8.3-603.jdbc4.jar storm-cassandra-0.4.0-rc4.jar compress-lzf-0.8.4
+ .jar gt-referencing-11.1.jar uuid-3.2.jar jackson-annotations-2.4.0.j
+ ar postgis-stubs-1.3.3.jar org.apache.servicemix.bundles.commons-csv-
+ 1.0-r706900_3.jar xml-commons-resolver-1.2.jar jline-0.9.94.jar metri
+ cs-core-3.0.2.jar curator-client-2.5.0.jar twitter4j-stream-3.0.5.jar
+  twitter4j-core-3.0.5.jar gt-xsd-wfs-11.1.jar gt-xsd-ows-11.1.jar gt-
+ xsd-filter-11.1.jar jackson-databind-2.4.3.jar xsd-2.6.0.jar jcommand
+ er-1.47.jar net.opengis.ows-11.1.jar antlr-3.2.jar vecmath-1.3.2.jar 
+ jackson-mapper-asl-1.9.13.jar imageio-ext-tiff-1.1.9.jar jai_core-1.1
+ .3.jar jetty-util-6.1.26.jar org.w3.xlink-11.1.jar jt-zonalstats-1.3.
+ 1.jar net.opengis.wfs-11.1.jar commons-cli-1.2.jar high-scale-lib-1.1
+ .2.jar metrics-core-2.0.3.jar concurrentlinkedhashmap-lru-1.3.jar jai
+ _codec-1.1.3.jar snakeyaml-1.11.jar jai_imageio-1.1.jar gt-shapefile-
+ 11.1.jar stax-api-1.0.1.jar imageio-ext-utilities-1.1.9.jar
+Main-Class: flink.applications.FlinkRunner
+

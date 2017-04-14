@@ -1,0 +1,148 @@
+/*
+ * #!
+ * %
+ * Copyright (C) 2014 - 2015 Humboldt-Universität zu Berlin
+ * %
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #_
+ */
+package flink.applications.topology.special_LRF.bolt.batch;
+
+import backtype.storm.task.OutputCollector;
+import backtype.storm.task.TopologyContext;
+import backtype.storm.topology.OutputFieldsDeclarer;
+import backtype.storm.topology.base.BaseRichBolt;
+import backtype.storm.tuple.Fields;
+import backtype.storm.tuple.Tuple;
+import backtype.storm.tuple.Values;
+import flink.applications.topology.special_LRF.TopologyControl;
+import flink.applications.topology.special_LRF.types.PositionReport;
+import flink.applications.topology.special_LRF.types.internal.CountTuple;
+import flink.applications.topology.special_LRF.types.util.SegmentIdentifier;
+import flink.applications.topology.special_LRF.util.CarCount;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Map.Entry;
+
+
+/**
+ * {@link BatchCountVehiclesBolt} counts the number of vehicles within an express way segment (single direction) every
+ * minute. The input is expected to be of type {@link PositionReport}, to be ordered by timestamp, and must be grouped
+ * by {@link SegmentIdentifier}. A new count value is emitted each 60 seconds (ie, changing 'minute number' [see
+ * Time.getMinute(short)]).<br />
+ * <br />
+ * <strong>Input schema:</strong> {@link PositionReport}<br />
+ * <strong>Output schema:</strong> {@link CountTuple} (stream: {@link TopologyControl#CAR_COUNTS_STREAM_ID})
+ *
+ * @author mjsax
+ */
+public class BatchCountVehiclesBolt extends BaseRichBolt {
+    private static final long serialVersionUID = 6158421247331445466L;
+    private static final Logger LOGGER = LoggerFactory.getLogger(BatchCountVehiclesBolt.class);
+    /**
+     * Internally (re)used object to access individual attributes.
+     */
+    private final PositionReport inputPositionReport = new PositionReport();
+    /**
+     * Internally (re)used object.
+     */
+    private final SegmentIdentifier segment = new SegmentIdentifier();
+    /**
+     * Maps each segment to its count value.
+     */
+    private final Map<SegmentIdentifier, CarCount> countsMap = new HashMap<SegmentIdentifier, CarCount>();
+    /**
+     * The Storm provided output collector.
+     */
+    private OutputCollector collector;
+    /**
+     * The currently processed 'minute number'.
+     */
+    private short currentMinute = -1;
+
+
+    @Override
+    public void prepare(@SuppressWarnings("rawtypes") Map stormConf, TopologyContext context, @SuppressWarnings("hiding") OutputCollector collector) {
+        this.collector = collector;
+    }
+
+    @Override
+    public void execute(Tuple tuple) {
+
+        //get input:
+        LinkedList<PositionReport> input_l = (LinkedList<PositionReport>) tuple.getValue(0);
+
+        //output :
+        LinkedList<CountTuple> counto = new LinkedList<CountTuple>();
+
+        for (int i = 0; i < input_l.size(); i++) {
+            this.inputPositionReport.clear();
+            this.inputPositionReport.addAll(input_l.get(i));
+            LOGGER.trace(this.inputPositionReport.toString());
+
+            short minute = this.inputPositionReport.getMinuteNumber();
+            this.segment.set(this.inputPositionReport);
+
+            assert (minute >= this.currentMinute);
+
+            if (minute > this.currentMinute) {
+                boolean emitted = false;
+                // emit all values for last minute
+                // (because input tuples are ordered by ts (ie, minute number), we can close the last minute safely)
+                for (Entry<SegmentIdentifier, CarCount> entry : this.countsMap.entrySet()) {
+                    SegmentIdentifier segId = entry.getKey();
+
+                    // Minute-Number, X-Way, Segment, Direction, Avg(speed)
+                    int count = entry.getValue().count;
+                    if (count > 50) {
+                        emitted = true;
+//                        this.collector.emit(TopologyControl.CAR_COUNTS_STREAM_ID, new CountTuple(new Short(
+//                                this.currentMinute), segId.getXWay(), segId.getSegment(), segId.getDirection(), new Integer(
+//                                count)));
+                        counto.add(new CountTuple(new Short(
+                                this.currentMinute), segId.getXWay(), segId.getSegment(), segId.getDirection(), new Integer(
+                                count)));
+                    }
+                }
+                if (!emitted) {
+                    //this.collector.emit(TopologyControl.CAR_COUNTS_STREAM_ID, new CountTuple(new Short(minute)));
+                    //this.collector.emit(TopologyControl.CAR_COUNTS_STREAM_ID, new Values(counto));
+                    counto.add(new CountTuple(new Short(minute)));
+                }
+                this.countsMap.clear();
+                this.currentMinute = minute;
+            }
+
+            CarCount segCnt = this.countsMap.get(this.segment);
+            if (segCnt == null) {
+                segCnt = new CarCount();
+                this.countsMap.put(this.segment.copy(), segCnt);
+            } else {
+                ++segCnt.count;
+            }
+        }
+        if (counto.size() > 0)
+            this.collector.emit(TopologyControl.CAR_COUNTS_STREAM_ID, new Values(counto));
+        this.collector.ack(tuple);
+    }
+
+    @Override
+    public void declareOutputFields(OutputFieldsDeclarer declarer) {
+        declarer.declareStream(TopologyControl.CAR_COUNTS_STREAM_ID, new Fields(TopologyControl.Field.CountTuple));
+    }
+
+}

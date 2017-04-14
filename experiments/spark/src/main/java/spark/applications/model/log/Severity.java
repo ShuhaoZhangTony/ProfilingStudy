@@ -1,0 +1,5 @@
+package spark.applications.model.log;
+
+public enum Severity {
+    LOW, MEDIUM, HIGH
+}

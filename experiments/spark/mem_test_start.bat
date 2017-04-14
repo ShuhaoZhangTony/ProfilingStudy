@@ -1,0 +1,1 @@
+/c start "memTest" /affinity 00000000FFFFFFFF "C:\Users\szhang026\Documents\storm-applications\mem_test.bat"

@@ -1,0 +1,36 @@
+package flink.applications.spout.parser;
+
+import com.google.common.collect.ImmutableList;
+import flink.applications.util.stream.StreamValues;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.LinkedList;
+import java.util.List;
+
+
+public class lrfParser extends Parser {
+
+    private static final Logger LOG = LoggerFactory.getLogger(lrParser.class);
+
+    @Override
+    public List<StreamValues> parse(String str) {
+        if (StringUtils.isBlank(str))
+            return null;
+
+        return ImmutableList.of(new StreamValues(str));
+
+    }
+
+    @Override
+    public List<StreamValues> parse(String[] input) {
+        List<String> srt = new LinkedList<>();
+        for (int i = 0; i < input.length; i++) {
+            if (input[i] != null)
+                srt.add(input[i]);
+        }
+        StreamValues rt = new StreamValues(srt);
+        return ImmutableList.of(rt);
+    }
+}
